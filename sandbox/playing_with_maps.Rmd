@@ -1,0 +1,44 @@
+---
+title: "Prueba mapa"
+author: "Luis Morís"
+date: "7/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(jsonlite)
+library(geojsonio)
+
+
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r maps}
+
+gijon_shp <- broom::tidy(geojson_sp(httr::content(httr::GET('http://127.0.0.1:5000/map'),encoding = , as = 'text')))
+
+ggplot(gijon_shp) + 
+    geom_polygon(aes(x=long, y=lat, group=group), fill='blue', color='white')
+
+
+gijon_shp <- geojson_sf(httr::content(httr::GET('http://127.0.0.1:5000/map'), as = 'text'))
+
+centroids <- gijon_shp %>% 
+    st_centroid() %>% 
+    bind_cols(as_tibble(st_coordinates(.)))
+
+ggplot(gijon_shp) + 
+    geom_sf() +
+    geom_text(aes(x=X, y=Y, label=barrio), data=centroids, size=2)
+
+```
+
+# 
